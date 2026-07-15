@@ -1,16 +1,16 @@
-from db.db import SessionLocal
-from db import crud
+from fastapi import FastAPI
+from .api import categories, books
+from .db.db import engine, Base
 
-db = SessionLocal()
+# Гарантируем, что таблицы созданы
+Base.metadata.create_all(bind=engine)
 
-print("=== СПИСОК КАТЕГОРИЙ ===")
-categories = crud.get_categories(db)
-for cat in categories:
-    print(f"ID: {cat.id} | Название: {cat.title}")
+app = FastAPI(title="Octagon Books API", description="API для управления книгами")
 
-print("\n=== СПИСОК КНИГ ===")
-books = crud.get_books(db)
-for book in books:
-    print(f"ID: {book.id} | {book.title} | Цена: {book.price} руб. | Категория: {book.category.title}")
+# Подключаем роутеры
+app.include_router(categories.router)
+app.include_router(books.router)
 
-db.close()
+@app.get("/health", tags=["health"])
+def health_check():
+    return {"status": "ok", "message": "Сервис работает"}
