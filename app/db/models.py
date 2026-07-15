@@ -1,0 +1,25 @@
+from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy.orm import relationship
+from .db import Base
+
+class Category(Base):
+    __tablename__ = "categories"
+    
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    title = Column(String, index=True)
+    
+    # Связь с книгами
+    books = relationship("Book", back_populates="category")
+
+class Book(Base):
+    __tablename__ = "books"
+    
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    title = Column(String, index=True)
+    description = Column(String)
+    price = Column(Float)
+    url = Column(String, default="")
+    
+    # Внешний ключ на категорию
+    category_id = Column(Integer, ForeignKey("categories.id"))
+    category = relationship("Category", back_populates="books")
