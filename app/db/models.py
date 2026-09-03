@@ -6,10 +6,12 @@ class Category(Base):
     __tablename__ = "categories"
     
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    title = Column(String, index=True)
+    # ИСПРАВЛЕНИЕ 1: Добавили unique=True, чтобы нельзя было создать две одинаковые категории
+    title = Column(String, unique=True, index=True)
     
-    # Связь с книгами
-    books = relationship("Book", back_populates="category")
+    # ИСПРАВЛЕНИЕ 2: Добавили cascade="all, delete-orphan"
+    # Теперь при удалении категории SQLAlchemy сам удалит все связанные книги
+    books = relationship("Book", back_populates="category", cascade="all, delete-orphan")
 
 class Book(Base):
     __tablename__ = "books"
@@ -20,6 +22,6 @@ class Book(Base):
     price = Column(Float)
     url = Column(String, default="")
     
-    # Внешний ключ на категорию
-    category_id = Column(Integer, ForeignKey("categories.id"))
+    # ИСПРАВЛЕНИЕ 3: Добавили ondelete="CASCADE" на уровне самой базы данных
+    category_id = Column(Integer, ForeignKey("categories.id", ondelete="CASCADE"), nullable=False)
     category = relationship("Category", back_populates="books")

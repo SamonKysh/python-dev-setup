@@ -2,6 +2,9 @@ from db.db import engine, Base, SessionLocal
 from db import crud, models
 
 # Создаем таблицы в базе данных
+
+Base.metadata.drop_all(bind=engine)
+
 Base.metadata.create_all(bind=engine)
 
 db = SessionLocal()
